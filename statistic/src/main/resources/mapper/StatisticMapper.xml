@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.demo.comentostatistic.dao.StatisticMapper">
+
+    <select id="selectYearLogin" parameterType="string" resultType="YearCountDto">
+        SELECT CONCAT('20', #{year}) AS year,
+               COUNT(*) AS totCnt
+        FROM statistic.request_info
+        WHERE create_date LIKE CONCAT('20', #{year}, '%')
+    </select>
+
+    <select id="selectYearMonthLogin" parameterType="string" resultType="YearMonthCountDto">
+        SELECT CONCAT('20', #{yearMonth}) AS yearMonth,
+               COUNT(*) AS totCnt
+        FROM statistic.request_info
+        WHERE create_date LIKE CONCAT('20', SUBSTR(#{yearMonth}, 1, 2), '-', SUBSTR(#{yearMonth}, 3, 2), '%')
+    </select>
+
+</mapper>
