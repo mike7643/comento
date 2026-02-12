@@ -1,0 +1,35 @@
+-- 1) 월별 접속자 수
+SELECT 
+    SUBSTR(create_date, 1, 7) AS month, 
+    COUNT(DISTINCT user_id) AS userCount
+FROM request_info
+GROUP BY SUBSTR(create_date, 1, 7);
+
+-- 2) 일자별 접속자 수
+SELECT 
+    create_date AS date, 
+    COUNT(DISTINCT user_id) AS userCount
+FROM request_info
+GROUP BY create_date;
+
+-- 3) 평균 하루 로그인 수
+SELECT 
+    ROUND(COUNT(*) / COUNT(DISTINCT create_date), 1) AS averageCount
+FROM request_info;
+
+-- 4) 휴일을 제외한 로그인 수
+SELECT create_date
+FROM request_info
+WHERE DAYOFWEEK(create_date) NOT IN (1, 7);
+
+-- 5) 부서별 월별 로그인 수
+SELECT 
+    u.hr_organ AS department,
+    SUBSTR(r.create_date, 1, 7) AS month,
+    COUNT(r.request_id) AS loginCount
+FROM request_info r
+INNER JOIN `user` u 
+    ON r.user_id = u.user_id
+GROUP BY 
+    u.hr_organ, 
+    SUBSTR(r.create_date, 1, 7);

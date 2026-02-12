@@ -19,4 +19,55 @@
         WHERE create_date LIKE CONCAT('20', SUBSTR(#{yearMonth}, 1, 2), '-', SUBSTR(#{yearMonth}, 3, 2), '%')
     </select>
 
+    <!-- 1) 월별 접속자 수 -->
+    <select id="selectMonthlyUserCnt" resultType="com.demo.comentostatistic.dto.MonthlyUserCountDto">
+        SELECT 
+            SUBSTR(create_date, 1, 7) AS month, 
+            COUNT(DISTINCT user_id) AS userCount
+        FROM request_info
+        GROUP BY SUBSTR(create_date, 1, 7)
+    </select>
+
+    <!-- 2) 일자별 접속자 수 -->
+    <select id="selectDailyUserCnt" resultType="com.demo.comentostatistic.dto.DailyUserCountDto">
+        SELECT 
+            create_date AS date, 
+            COUNT(DISTINCT user_id) AS userCount
+        FROM request_info
+        GROUP BY create_date
+    </select>
+
+    <!-- 3) 평균 하루 로그인 수 -->
+    <select id="selectAvgDailyLoginCnt" resultType="com.demo.comentostatistic.dto.AvgDailyLoginCountDto">
+        SELECT 
+            ROUND(COUNT(*) / COUNT(DISTINCT create_date), 1) AS averageCount
+        FROM request_info
+    </select>
+
+    <!-- 4-1) 주중 로그인 날짜들 (공휴일 제외 처리를 위해 자바에서 사용) -->
+    <select id="selectWeekdayLogins" resultType="string">
+        SELECT create_date
+        FROM request_info
+        WHERE DAYOFWEEK(create_date) NOT IN (1, 7)
+    </select>
+
+    <!-- 4-2) 공휴일 목록 조회 -->
+    <select id="selectHolidays" resultType="string">
+        SELECT holiday_date FROM holiday
+    </select>
+
+    <!-- 5) 부서별 월별 로그인 수 -->
+    <select id="selectDeptMonthlyLoginCnt" resultType="com.demo.comentostatistic.dto.DeptMonthlyLoginCountDto">
+        SELECT 
+            u.hr_organ AS department,
+            SUBSTR(r.create_date, 1, 7) AS month,
+            COUNT(r.request_id) AS loginCount
+        FROM request_info r
+        INNER JOIN `user` u 
+            ON r.user_id = u.user_id
+        GROUP BY 
+            u.hr_organ, 
+            SUBSTR(r.create_date, 1, 7)
+    </select>
+
 </mapper>
